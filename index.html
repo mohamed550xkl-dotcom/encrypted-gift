@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100b14">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>هدية خاصة لزينب ♥</title>
+<style>
+:root{color-scheme:dark;font-family:Tahoma,Arial,sans-serif;background:#100b14;color:#fff}*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 35%,#42203b 0,#211522 45%,#100b14 78%)}.card{width:min(100%,420px);padding:32px 25px;border:1px solid #e69acb55;border-radius:24px;background:#170f1ddd;box-shadow:0 20px 80px #0009,0 0 45px #c3378c22;text-align:center}h1{margin:0 0 10px;font-size:25px;color:#ffe4f4}p{margin:0 0 24px;color:#dec7d6;line-height:1.8}label{display:block;text-align:right;margin-bottom:8px;color:#ffe4f4;font-weight:700}input{width:100%;padding:14px;border:1px solid #d985b477;border-radius:12px;background:#0d0911;color:#fff;font-size:16px;outline:none}input:focus{border-color:#ff8ece;box-shadow:0 0 0 3px #ff8ece22}button{width:100%;margin-top:14px;padding:14px;border:0;border-radius:12px;background:linear-gradient(100deg,#d94c9f,#8f4bd0);color:white;font-size:16px;font-weight:700;cursor:pointer}button:disabled{opacity:.7;cursor:wait}#status{min-height:24px;margin:14px 0 0;color:#ffbddc;font-size:14px}.heart{font-size:38px;margin-bottom:12px;color:#ff7fbf;text-shadow:0 0 25px #ff65b8}</style>
+</head><body>
+<main class="card">
+<div class="heart" aria-hidden="true">♥</div>
+<h1>هدية خاصة لزينب</h1>
+<p>اكتبي كلمة السر اللي وصلتك بشكل منفصل علشان تفتحي الموقع.</p>
+<form id="unlockForm">
+<label for="password">كلمة السر</label>
+<input id="password" type="password" autocomplete="current-password" required autofocus>
+<button id="unlockButton" type="submit">افتحي الهدية ♥</button>
+</form>
+<p id="status" role="status" aria-live="polite"></p>
+</main>
+<script>
+const form=document.getElementById('unlockForm');
+const field=document.getElementById('password');
+const button=document.getElementById('unlockButton');
+const status=document.getElementById('status');
+const enc=new TextEncoder();
+const dec=new TextDecoder();
+const ITERATIONS=310000;
+async function unlock(password){
+  const response=await fetch('./vault.bin',{cache:'no-store'});
+  if(!response.ok) throw new Error('تعذر تحميل الهدية. جرّبي فتح الرابط مرة أخرى.');
+  const bytes=new Uint8Array(await response.arrayBuffer());
+  if(bytes.length<49||dec.decode(bytes.slice(0,4))!=='ZBV1') throw new Error('ملف الهدية غير صالح.');
+  const salt=bytes.slice(4,20),iv=bytes.slice(20,32),cipher=bytes.slice(32);
+  const material=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:ITERATIONS,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['decrypt']);
+  const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:enc.encode('ZAINAB_PRIVATE_V1')},key,cipher);
+  return JSON.parse(dec.decode(clear));
+}
+function toBytes(b64){const raw=atob(b64),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return bytes}
+form.addEventListener('submit',async event=>{
+  event.preventDefault();button.disabled=true;button.textContent='لحظة واحدة…';status.textContent='بنفك تشفير الهدية';
+  try{
+    const content=await unlock(field.value);
+    const urls={};
+    for(const [name,item] of Object.entries(content.assets)) urls[name]=URL.createObjectURL(new Blob([toBytes(item.base64)],{type:item.type}));
+    let html=content.html;
+    html=html.replace('music: "music/krasivaya.mp3"','music: window.PRIVATE_ASSETS["music/krasivaya.mp3"]');
+    html=html.replace('const photoFiles = Array.from({ length: 11 }, (_, i) => `memories/photos/memory-${String(i + 1).padStart(2, "0")}.webp`);','const photoFiles = Array.from({ length: 11 }, (_, i) => window.PRIVATE_ASSETS[`memories/photos/memory-${String(i + 1).padStart(2, "0")}.webp`]);');
+    html=html.replace('</head>','<script>window.PRIVATE_ASSETS='+JSON.stringify(urls)+';<\/script></head>');
+    document.open();document.write(html);document.close();
+  }catch(error){status.textContent=error.name==='OperationError'?'كلمة السر غير صحيحة، راجعيها وحاولي مرة أخرى.':(error.message||'حصلت مشكلة أثناء فتح الهدية.');button.disabled=false;button.textContent='افتحي الهدية ♥'}
+});
+</script>
+</body></html>
