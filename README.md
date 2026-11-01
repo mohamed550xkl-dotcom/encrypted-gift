@@ -1,3 +1,3 @@
-# هدية زينب الخاصة
+# Encrypted private birthday site
 
-الموقع والبيانات والصور والأغنية محفوظة داخل `vault.bin` بتشفير AES-GCM، ومفتاحها كلمة سر منفصلة. لا ترفع ملف كلمة السر إلى المستودع.
+The page content, photos, and audio are stored in `vault.bin` using AES-GCM encryption. The password is separate and is not included in this repository.
