@@ -1,1 +1,32 @@
-<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>هدية خاصة ♥</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;box-sizing:border-box;background:radial-gradient(ellipse at 50% 35%,#42203b,#211522 48%,#100b14 80%);color:#fff;font:16px Tahoma,Arial,sans-serif}.c{width:min(100%,390px);padding:30px 24px;border:1px solid #e69acb55;border-radius:24px;background:#170f1ddd;box-shadow:0 20px 80px #0009;text-align:center}.h{font-size:38px;color:#ff7fbf}p{color:#dec7d6;line-height:1.8}input,button{box-sizing:border-box;width:100%;padding:14px;border-radius:12px;font:inherit}input{margin-top:8px;border:1px solid #d985b477;background:#0d0911;color:white}button{margin-top:14px;border:0;background:linear-gradient(100deg,#d94c9f,#8f4bd0);color:white;font-weight:700}#s{display:block;min-height:24px;margin-top:12px;color:#ffbddc}</style><main class="c"><div class="h">♥</div><h1>هدية خاصة</h1><p>اكتبي كلمة السر اللي وصلتك بشكل منفصل علشان تفتحي الموقع.</p><form id="f"><input id="p" type="password" autocomplete="current-password" placeholder="كلمة السر" required><button id="b">افتحي الهدية ♥</button></form><output id="s" aria-live="polite"></output></main><script>const E=new TextEncoder,D=new TextDecoder,F=document.getElementById('f'),P=document.getElementById('p'),B=document.getElementById('b'),S=document.getElementById('s');function byt(x){const r=atob(x),a=new Uint8Array(r.length);for(let i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a}F.addEventListener('submit',async e=>{e.preventDefault();B.disabled=true;S.textContent='بنفك تشفير الهدية…';try{const r=await fetch('./vault.bin',{cache:'no-store'});if(!r.ok)throw Error();const a=new Uint8Array(await r.arrayBuffer());if(D.decode(a.slice(0,4))!=='ZBV1')throw Error();const m=await crypto.subtle.importKey('raw',E.encode(P.value),'PBKDF2',false,['deriveKey']),k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:a.slice(4,20),iterations:310000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['decrypt']),c=await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(20,32),additionalData:E.encode('MARIAM_PRIVATE_V1')},k,a.slice(32)),v=JSON.parse(D.decode(c)),u={};for(const[n,x]of Object.entries(v.assets))u[n]=URL.createObjectURL(new Blob([byt(x.base64)],{type:x.type}));let h=v.html;h=h.replace('</head>','<script>window.PRIVATE_ASSETS='+JSON.stringify(u)+';<\/script></head>');document.open();document.write(h);document.close()}catch(e){S.textContent='كلمة السر غير صحيحة أو تعذّر تحميل الهدية.';B.disabled=false}});</script></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>هدية خاصة ♥</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at 50% 35%,#420e16,#1b080d 48%,#080509 80%);color:#fff;font:16px Tahoma,Arial,sans-serif}
+  .card{width:min(100%,390px);padding:30px 24px;border:1px solid #ff697a55;border-radius:24px;background:#1a0b0fdd;box-shadow:0 20px 80px #0009;text-align:center}.heart{font-size:38px;color:#ff465a;text-shadow:0 0 20px #ff263f}
+  p{color:#f3ccd0;line-height:1.8}input,button{box-sizing:border-box;width:100%;padding:14px;border-radius:12px;font:inherit}input{margin-top:8px;border:1px solid #ff617377;background:#0d090b;color:white}button{margin-top:14px;border:0;background:linear-gradient(100deg,#c4142c,#f44357);color:white;font-weight:700;cursor:pointer}button:disabled{opacity:.7}#s{display:block;min-height:24px;margin-top:12px;color:#ffc1c8}
+</style>
+<main class="card"><div class="heart">♥</div><h1>هدية خاصة</h1><p>اكتبي كلمة السر اللي وصلتك بشكل منفصل علشان تفتحي الموقع.</p><form id="f"><input id="p" type="password" autocomplete="current-password" placeholder="كلمة السر" required><button id="b">افتحي الهدية ♥</button></form><output id="s" aria-live="polite"></output></main>
+<script>
+const enc=new TextEncoder(),dec=new TextDecoder(),form=document.getElementById('f'),password=document.getElementById('p'),button=document.getElementById('b'),status=document.getElementById('s');
+function bytes(value){const raw=atob(value),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
+form.addEventListener('submit',async event=>{
+  event.preventDefault();button.disabled=true;status.textContent='بنفك تشفير الهدية…';
+  try{
+    const response=await fetch('./vault.bin',{cache:'no-store'});if(!response.ok)throw Error();
+    const data=new Uint8Array(await response.arrayBuffer());if(dec.decode(data.slice(0,4))!=='ZBV1')throw Error();
+    const material=await crypto.subtle.importKey('raw',enc.encode(password.value),'PBKDF2',false,['deriveKey']);
+    const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:data.slice(4,20),iterations:310000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['decrypt']);
+    const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:data.slice(20,32),additionalData:enc.encode('MARIAM_PRIVATE_V1')},key,data.slice(32));
+    const content=JSON.parse(dec.decode(clear)),urls={};
+    for(const[name,asset]of Object.entries(content.assets))urls[name]=URL.createObjectURL(new Blob([bytes(asset.base64)],{type:asset.type}));
+    let html=content.html;html=html.replace('music: "music/krasivaya.mp3"','music: window.PRIVATE_ASSETS["music/krasivaya.mp3"]');
+    html=html.replace('</head>','<script>window.PRIVATE_ASSETS='+JSON.stringify(urls)+';<\/script></head>');
+    document.open();document.write(html);document.close();
+  }catch(error){status.textContent='كلمة السر غير صحيحة أو تعذّر تحميل الهدية.';button.disabled=false}
+});
+</script>
+</html>
