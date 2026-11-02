@@ -23,7 +23,7 @@ form.addEventListener('submit',async event=>{
     const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:data.slice(20,32),additionalData:enc.encode('MARIAM_PRIVATE_V1')},key,data.slice(32));
     const content=JSON.parse(dec.decode(clear)),urls={};
     for(const[name,asset]of Object.entries(content.assets))urls[name]=URL.createObjectURL(new Blob([bytes(asset.base64)],{type:asset.type}));
-    let html=content.html;html=html.replace('music: "music/krasivaya.mp3"','music: window.PRIVATE_ASSETS["music/krasivaya.mp3"]');
+    let html=content.html;html=html.replace('music: "music/mariam-song.mp3"','music: window.PRIVATE_ASSETS["music/mariam-song.mp3"]');
     html=html.replace('</head>','<script>window.PRIVATE_ASSETS='+JSON.stringify(urls)+';<\/script></head>');
     document.open();document.write(html);document.close();
   }catch(error){status.textContent='كلمة السر غير صحيحة أو تعذّر تحميل الهدية.';button.disabled=false}
